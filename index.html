@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>SkinCare AI - كشف سرطان الجلد</title>
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #c8e8ff 0%, #e0f2fe 50%, #b8dff0 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        body.dark {
+            background: linear-gradient(135deg, #0a1628 0%, #0d2137 50%, #0a1a2a 100%);
+        }
+
+        body.dark .result-modal {
+            background: linear-gradient(135deg, #1a2a3a, #0f1a24);
+            color: #e0e0e0;
+        }
+
+        .app-container {
+            max-width: 650px;
+            width: 100%;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 56px;
+            padding: 2rem 1.8rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        body.dark .app-container {
+            background: rgba(18, 28, 40, 0.95);
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .logo h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #0066cc, #0099ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        body.dark .logo h1 {
+            background: linear-gradient(135deg, #4d9eff, #00c3ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+        }
+
+        .logo p {
+            font-size: 0.8rem;
+            color: #4a6f8f;
+            margin-top: 4px;
+        }
+
+        body.dark .logo p {
+            color: #8aaec0;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .dark-toggle, .lang-toggle {
+            background: #e0ecf5;
+            border: none;
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1e5a7a;
+            transition: 0.2s;
+        }
+
+        body.dark .dark-toggle,
+        body.dark .lang-toggle {
+            background: #2a3f54;
+            color: #ffd966;
+        }
+
+        .upload-section {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e4a6e;
+            margin-bottom: 0.5rem;
+        }
+
+        body.dark .title {
+            color: #bdd4e8;
+        }
+
+        .sub {
+            color: #5a7d9a;
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1.8rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .btn-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            background: #f0f8ff;
+            border: 2px solid #cde5f5;
+            border-radius: 48px;
+            padding: 1.2rem 2rem;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            min-width: 140px;
+        }
+
+        body.dark .btn-action {
+            background: #1e2f3e;
+            border-color: #2e4a62;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-5px);
+            background: #e4f0fe;
+            border-color: #66b5ff;
+            box-shadow: 0 12px 20px -10px rgba(0, 100, 200, 0.2);
+        }
+
+        .btn-action i {
+            font-size: 3rem;
+            color: #0080d0;
+        }
+
+        body.dark .btn-action i {
+            color: #4da8ff;
+        }
+
+        .btn-action span {
+            font-weight: 600;
+            color: #1e5a7a;
+            font-size: 1rem;
+        }
+
+        body.dark .btn-action span {
+            color: #cce4f5;
+        }
+
+        .preview-area {
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        #previewImg {
+            max-width: 100%;
+            max-height: 220px;
+            border-radius: 32px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            display: none;
+            margin: 0 auto;
+            border: 3px solid white;
+        }
+
+        body.dark #previewImg {
+            border-color: #2a4a6a;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .result-modal {
+            background: white;
+            max-width: 500px;
+            width: 90%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-radius: 48px;
+            padding: 2rem 1.8rem;
+            text-align: center;
+            box-shadow: 0 40px 60px rgba(0, 0, 0, 0.4);
+            transform: scale(0.95);
+            transition: 0.2s;
+        }
+
+        .modal-overlay.active .result-modal {
+            transform: scale(1);
+        }
+
+        .result-status {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .result-type {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            padding: 8px;
+            border-radius: 40px;
+            display: inline-block;
+        }
+
+        .circle-percent {
+            position: relative;
+            width: 140px;
+            height: 140px;
+            margin: 1rem auto;
+        }
+
+        .circle-percent canvas {
+            width: 100%;
+            height: 100%;
+        }
+
+        .percent-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+
+        .type-description {
+            background: #f0f7fc;
+            border-radius: 24px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: right;
+        }
+
+        body.dark .type-description {
+            background: #1e3a4a;
+        }
+
+        .recommendations {
+            text-align: right;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8f9fc;
+            border-radius: 28px;
+        }
+
+        body.dark .recommendations {
+            background: #1e2f3c;
+        }
+
+        .recommendations h4 {
+            margin-bottom: 0.8rem;
+            font-size: 1.1rem;
+        }
+
+        .recommendations ul {
+            padding-right: 1.5rem;
+        }
+
+        .recommendations li {
+            margin: 0.5rem 0;
+            text-align: right;
+        }
+
+        .close-modal {
+            margin-top: 1.5rem;
+            background: #eef2f7;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        #cameraFileInput {
+            display: none;
+        }
+
+        @media (max-width: 550px) {
+            .app-container {
+                padding: 1.5rem;
+            }
+            .btn-action {
+                padding: 0.8rem 1.2rem;
+                min-width: 120px;
+            }
+            .result-type {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="header">
+        <div class="logo">
+            <h1>⚕️ SkinGuard AI</h1>
+            <p class="logo-sub">كشف سرطان الجلد بدقة ذكاء اصطناعي</p>
+        </div>
+        <div class="header-buttons">
+            <button class="lang-toggle" id="langToggleBtn"><i class="fas fa-globe"></i></button>
+            <button class="dark-toggle" id="darkModeToggle"><i class="fas fa-moon"></i></button>
+        </div>
+    </div>
+
+    <div class="upload-section">
+        <div class="title" id="titleText">تحليل عينة الجلد</div>
+        <div class="sub" id="subText">التقط صورة أو ارفق صورة لعينة من جلدك</div>
+    </div>
+
+    <div class="action-buttons">
+        <div class="btn-action" id="cameraBtn">
+            <i class="fas fa-camera"></i>
+            <span id="cameraBtnText">التقاط صورة</span>
+        </div>
+        <div class="btn-action" id="galleryBtn">
+            <i class="fas fa-image"></i>
+            <span id="galleryBtnText">رفع صورة</span>
+        </div>
+        <input type="file" id="fileInput" accept="image/*" style="display: none;">
+        <input type="file" id="cameraFileInput" accept="image/*" capture="environment" style="display: none;">
+    </div>
+
+    <div class="preview-area">
+        <img id="previewImg" alt="معاينة العينة">
+    </div>
+</div>
+
+<div class="modal-overlay" id="resultModal">
+    <div class="result-modal">
+        <div class="result-status" id="resultStatus">--</div>
+        <div class="result-type" id="resultType">---</div>
+        <div class="circle-percent">
+            <canvas id="resultCanvas" width="200" height="200"></canvas>
+            <div class="percent-text" id="percentValue">0%</div>
+        </div>
+        <div class="type-description" id="typeDescription">
+            <p id="descText">...</p>
+        </div>
+        <div class="recommendations" id="recommendBox">
+            <h4 id="recommendTitle">📋 الإجراء الموصى به</h4>
+            <ul id="recommendList">
+                <li>...</li>
+            </ul>
+        </div>
+        <button class="close-modal" id="closeModalBtn">إغلاق</button>
+    </div>
+</div>
+
+<script>
+    // ==================== بيانات أنواع سرطان الجلد السبعة ====================
+    const skinTypesData = {
+        akiec: { name: 'AKIEC - Actinic Keratosis', nameAr: 'AKIEC - التقران السفعي (ما قبل سرطاني)', severity: 'high', color: '#e67e22',
+            descAr: 'التقران السفعي هو آفة جلدية ناتجة عن أضرار أشعة الشمس المزمنة. تعتبر حالة ما قبل سرطانية قد تتطور إلى سرطان الخلايا الحرشفية.',
+            descEn: 'Actinic keratosis is a sun-damaged skin lesion. It is considered a precancerous condition that may develop into squamous cell carcinoma.',
+            adviceAr: ['استشارة طبيب جلدية فوراً', 'علاج بالتبريد أو كريمات موضعية', 'فحص دوري كل 3-6 أشهر', 'حماية قوية من الشمس'],
+            adviceEn: ['Consult a dermatologist immediately', 'Cryotherapy or topical creams', 'Regular checkup every 3-6 months', 'Strong sun protection'] },
+        bcc: { name: 'BCC - Basal Cell Carcinoma', nameAr: 'BCC - سرطان الخلايا القاعدية', severity: 'high', color: '#c0392b',
+            descAr: 'سرطان الخلايا القاعدية هو أكثر أنواع سرطان الجلد شيوعاً. ينمو ببطء ونادراً ما ينتشر، لكنه يسبب تدميراً موضعياً.',
+            descEn: 'Basal cell carcinoma is the most common type of skin cancer. It grows slowly and rarely spreads, but causes local tissue damage.',
+            adviceAr: ['إزالة جراحية كاملة للورم', 'علاج موضعي أو جراحة موس', 'متابعة دورية', 'تجنب التعرض للشمس'],
+            adviceEn: ['Complete surgical removal', 'Topical treatment or Mohs surgery', 'Regular follow-up', 'Avoid sun exposure'] },
+        bkl: { name: 'BKL - Benign Keratosis', nameAr: 'BKL - التقران الحميد', severity: 'low', color: '#27ae60',
+            descAr: 'التقران الحميد (مثل التقران الدهني) هو نمو جلدي غير سرطاني شائع مع تقدم العمر. لا يشكل خطراً على الصحة.',
+            descEn: 'Benign keratosis (such as seborrheic keratosis) is a common non-cancerous skin growth that appears with age. No health risk.',
+            adviceAr: ['لا يحتاج علاجاً عادةً', 'مراقبة لأي تغيرات', 'يمكن إزالته لأسباب تجميلية', 'فحص دوري روتيني'],
+            adviceEn: ['Usually no treatment needed', 'Monitor for any changes', 'Can be removed for cosmetic reasons', 'Routine skin check'] },
+        df: { name: 'DF - Dermatofibroma', nameAr: 'DF - الليفومة الجلدية', severity: 'low', color: '#8e44ad',
+            descAr: 'الليفومة الجلدية هي عقيدات حميدة شائعة غالباً ما تظهر بعد إصابة بسيطة. غير ضارة ولا تتحول إلى سرطان.',
+            descEn: 'Dermatofibroma is a common benign nodule that often appears after minor trauma. Harmless and does not turn cancerous.',
+            adviceAr: ['عادةً لا يحتاج علاج', 'مراقبة فقط', 'يمكن استئصاله إذا تسبب بأعراض', 'فحص دوري'],
+            adviceEn: ['Usually no treatment', 'Observation only', 'Can be removed if symptomatic', 'Regular skin exam'] },
+        mel: { name: 'MEL - Melanoma', nameAr: 'MEL - الورم الميلانيني (سرطان خطير)', severity: 'critical', color: '#e74c3c',
+            descAr: 'الورم الميلانيني هو أخطر أنواع سرطان الجلد. يمكن أن ينتشر بسرعة إذا لم يُكتشف مبكراً. يتطلب تدخلاً فورياً.',
+            descEn: 'Melanoma is the most dangerous type of skin cancer. It can spread rapidly if not detected early. Requires immediate intervention.',
+            adviceAr: ['تدخل طبي عاجل جداً!', 'خزعة فورية وجراحة استئصال', 'فحص الغدد الليمفاوية', 'متابعة دقيقة وعلاج مناعي إن لزم'],
+            adviceEn: ['URGENT medical intervention!', 'Immediate biopsy and excision', 'Lymph node examination', 'Close follow-up and possible immunotherapy'] },
+        nv: { name: 'NV - Melanocytic Nevus', nameAr: 'NV - الشامة الميلانينية (حميدة)', severity: 'low', color: '#3498db',
+            descAr: 'الشامات الميلانينية هي شامات عادية حميدة. معظمها غير ضار، لكن يجب مراقبتها بحثاً عن تغيرات.',
+            descEn: 'Melanocytic nevi are common benign moles. Most are harmless, but should be monitored for changes.',
+            adviceAr: ['مراقبة دورية للشامات', 'تجنب التعرض المفرط للشمس', 'تصوير الشامات للمقارنة', 'استشارة في حال تغير الحجم أو اللون'],
+            adviceEn: ['Regular mole monitoring', 'Avoid excessive sun exposure', 'Take mole photos for comparison', 'Consult if size/color changes'] },
+        vas: { name: 'VAS - Vascular Lesion', nameAr: 'VAS - الآفة الوعائية', severity: 'low', color: '#e84393',
+            descAr: 'الآفات الوعائية مثل الأوردة العنكبوتية أو الأورام الوعائية. غالباً ما تكون حميدة ولا تشكل خطراً.',
+            descEn: 'Vascular lesions such as spider veins or hemangiomas. Usually benign and not dangerous.',
+            adviceAr: ['لا حاجة لعلاج عادةً', 'للأغراض التجميلية يمكن استخدام الليزر', 'مراقبة روتينية', 'استشارة إن تزايد حجم الآفة'],
+            adviceEn: ['Usually no treatment needed', 'Laser therapy for cosmetic purposes', 'Routine monitoring', 'Consult if lesion enlarges'] }
+    };
+
+    // ==================== اللغة ====================
+    let currentLang = 'ar';
+
+    const translations = {
+        ar: {
+            logoSub: 'كشف سرطان الجلد بدقة ذكاء اصطناعي',
+            title: 'تحليل عينة الجلد',
+            sub: 'التقط صورة أو ارفق صورة لعينة من جلدك',
+            cameraBtn: 'التقاط صورة',
+            galleryBtn: 'رفع صورة',
+            analyzing: 'جاري التحليل... 🔬',
+            analyzingPlaceholder: 'تحليل العينة باستخدام الذكاء الاصطناعي...',
+            recommendTitle: '📋 الإجراء الموصى به',
+            closeBtn: 'إغلاق',
+            confidenceLabel: 'نسبة الثقة'
+        },
+        en: {
+            logoSub: 'Skin cancer detection with AI precision',
+            title: 'Skin Sample Analysis',
+            sub: 'Take a photo or upload an image of your skin sample',
+            cameraBtn: 'Take Photo',
+            galleryBtn: 'Upload Image',
+            analyzing: 'Analyzing... 🔬',
+            analyzingPlaceholder: 'Analyzing sample using artificial intelligence...',
+            recommendTitle: '📋 Recommended Action',
+            closeBtn: 'Close',
+            confidenceLabel: 'Confidence'
+        }
+    };
+
+    function updateLanguage() {
+        const t = translations[currentLang];
+        document.querySelector('.logo-sub').textContent = t.logoSub;
+        document.getElementById('titleText').textContent = t.title;
+        document.getElementById('subText').textContent = t.sub;
+        document.getElementById('cameraBtnText').textContent = t.cameraBtn;
+        document.getElementById('galleryBtnText').textContent = t.galleryBtn;
+        document.getElementById('recommendTitle').textContent = t.recommendTitle;
+        document.getElementById('closeModalBtn').textContent = t.closeBtn;
+        
+        if (currentLang === 'ar') {
+            document.documentElement.dir = 'rtl';
+            document.body.style.direction = 'rtl';
+            document.querySelector('.recommendations').style.textAlign = 'right';
+        } else {
+            document.documentElement.dir = 'ltr';
+            document.body.style.direction = 'ltr';
+            document.querySelector('.recommendations').style.textAlign = 'left';
+        }
+    }
+
+    function toggleLanguage() {
+        currentLang = currentLang === 'ar' ? 'en' : 'ar';
+        updateLanguage();
+    }
+
+    // ==================== عناصر DOM ====================
+    const cameraBtn = document.getElementById('cameraBtn');
+    const galleryBtn = document.getElementById('galleryBtn');
+    const fileInput = document.getElementById('fileInput');
+    const cameraFileInput = document.getElementById('cameraFileInput');
+    const previewImg = document.getElementById('previewImg');
+    const modalOverlay = document.getElementById('resultModal');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const darkToggle = document.getElementById('darkModeToggle');
+    const langToggleBtn = document.getElementById('langToggleBtn');
+    const resultStatus = document.getElementById('resultStatus');
+    const resultType = document.getElementById('resultType');
+    const percentValueSpan = document.getElementById('percentValue');
+    const recommendList = document.getElementById('recommendList');
+    const descText = document.getElementById('descText');
+    const canvasCtx = document.getElementById('resultCanvas').getContext('2d');
+
+    let currentImageFile = null;
+
+    // ========== محاكاة تحليل النموذج (تعيد نوعاً من الأنواع السبعة) ==========
+    function simulateAIAnalysis(imageFile) {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // الأنواع السبعة: akiec, bcc, bkl, df, mel, nv, vas
+                const types = ['akiec', 'bcc', 'bkl', 'df', 'mel', 'nv', 'vas'];
+                // توزيع احتمالي: الميلانينا أقل شيوعاً، الأنواع الحميدة أكثر
+                const weights = [0.12, 0.10, 0.20, 0.15, 0.08, 0.25, 0.10];
+                let random = Math.random();
+                let selectedType = 'nv';
+                let cumulative = 0;
+                for (let i = 0; i < types.length; i++) {
+                    cumulative += weights[i];
+                    if (random < cumulative) {
+                        selectedType = types[i];
+                        break;
+                    }
+                }
+                
+                // نسبة الثقة بين 65% و 98%
+                const confidence = Math.floor(Math.random() * 34) + 65;
+                const typeData = skinTypesData[selectedType];
+                
+                resolve({
+                    type: selectedType,
+                    confidence: confidence,
+                    typeData: typeData
+                });
+            }, 1300);
+        });
+    }
+
+    // رسم دائرة النسبة
+    function drawPercentageCircle(percentage, color) {
+        const canvas = document.getElementById('resultCanvas');
+        const ctx = canvasCtx;
+        const size = 200;
+        canvas.width = size;
+        canvas.height = size;
+        ctx.clearRect(0, 0, size, size);
+        
+        const centerX = size/2, centerY = size/2;
+        const radius = 70;
+        const startAngle = -0.5 * Math.PI;
+        const endAngle = startAngle + (2 * Math.PI * (percentage / 100));
+        
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.strokeStyle = "#e2e8f0";
+        ctx.lineWidth = 14;
+        ctx.stroke();
+        
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 14;
+        ctx.lineCap = "round";
+        ctx.stroke();
+        
+        percentValueSpan.innerText = `${percentage}%`;
+    }
+
+    // عرض النتيجة مع نوع الجلد
+    async function showResultForImage(imageFile) {
+        if (!imageFile) {
+            const t = translations[currentLang];
+            alert(currentLang === 'ar' ? 'الرجاء اختيار صورة أولاً' : 'Please select an image first');
+            return;
+        }
+        
+        modalOverlay.classList.add('active');
+        const t = translations[currentLang];
+        resultStatus.innerText = t.analyzing;
+        resultType.innerText = '---';
+        descText.innerText = '...';
+        recommendList.innerHTML = `<li>${t.analyzingPlaceholder}</li>`;
+        drawPercentageCircle(0, "#cccccc");
+        percentValueSpan.innerText = "0%";
+        
+        const analysis = await simulateAIAnalysis(imageFile);
+        const typeData = analysis.typeData;
+        const confidence = analysis.confidence;
+        
+        // عرض اسم النوع حسب اللغة
+        const typeName = currentLang === 'ar' ? typeData.nameAr : typeData.name;
+        resultType.innerText = typeName;
+        
+        // تحديد لون النتيجة بناءً على الخطورة
+        let severityColor = '#27ae60';
+        if (typeData.severity === 'high') severityColor = '#e67e22';
+        if (typeData.severity === 'critical') severityColor = '#e74c3c';
+        resultType.style.backgroundColor = severityColor + '20';
+        resultType.style.color = severityColor;
+        
+        // عرض وصف النوع
+        const description = currentLang === 'ar' ? typeData.descAr : typeData.descEn;
+        descText.innerHTML = `<i class="fas fa-info-circle" style="margin-left: 8px;"></i> ${description}`;
+        
+        // عرض النسبة
+        drawPercentageCircle(confidence, severityColor);
+        
+        // عرض الإجراءات الموصى بها
+        const adviceList = currentLang === 'ar' ? typeData.adviceAr : typeData.adviceEn;
+        recommendList.innerHTML = "";
+        adviceList.forEach(adv => {
+            const li = document.createElement('li');
+            let icon = 'fa-check-circle';
+            if (typeData.severity === 'critical') icon = 'fa-exclamation-triangle';
+            else if (typeData.severity === 'high') icon = 'fa-shield-alt';
+            li.innerHTML = `<i class="fas ${icon}" style="margin-left: 10px; color:${severityColor};"></i> ${adv}`;
+            recommendList.appendChild(li);
+        });
+        
+        // حالة النتيجة العامة
+        let statusMessage = '';
+        if (typeData.severity === 'critical') statusMessage = currentLang === 'ar' ? '⚠️ حالة حرجة - استشارة فورية مطلوبة!' : '⚠️ Critical condition - Immediate consultation required!';
+        else if (typeData.severity === 'high') statusMessage = currentLang === 'ar' ? '⚠️ حالة تتطلب متابعة طبية' : '⚠️ Medical follow-up required';
+        else statusMessage = currentLang === 'ar' ? '✅ آفة حميدة - تطمين ومراقبة' : '✅ Benign lesion - Reassurance and monitoring';
+        resultStatus.innerText = statusMessage;
+        
+        const modalDiv = document.querySelector('.result-modal');
+        modalDiv.style.borderTop = `6px solid ${severityColor}`;
+    }
+
+    // معالجة الصورة
+    function handleImage(file) {
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            previewImg.src = e.target.result;
+            previewImg.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+        currentImageFile = file;
+        showResultForImage(file);
+    }
+
+    // فتح الكاميرا
+    cameraBtn.addEventListener('click', () => {
+        cameraFileInput.click();
+    });
+    
+    cameraFileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            handleImage(e.target.files[0]);
+        }
+        cameraFileInput.value = '';
+    });
+    
+    galleryBtn.addEventListener('click', () => {
+        fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files && e.target.files[0]) {
+            handleImage(e.target.files[0]);
+        }
+    });
+    
+    closeModalBtn.addEventListener('click', () => {
+        modalOverlay.classList.remove('active');
+    });
+    
+    modalOverlay.addEventListener('click', (e) => {
+        if (e.target === modalOverlay) {
+            modalOverlay.classList.remove('active');
+        }
+    });
+    
+    // Dark mode
+    darkToggle.addEventListener('click', () => {
+        document.body.classList.toggle('dark');
+        const icon = darkToggle.querySelector('i');
+        if (document.body.classList.contains('dark')) {
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+        } else {
+            icon.classList.remove('fa-sun');
+            icon.classList.add('fa-moon');
+        }
+    });
+    
+    langToggleBtn.addEventListener('click', toggleLanguage);
+    updateLanguage();
+</script>
+</body>
+</html>
