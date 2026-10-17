@@ -199,6 +199,13 @@ curl -X POST "http://localhost:8000/predict" \
 > Glastoma AI is an artificial intelligence research and clinical decision-support tool. It is intended to assist medical professionals and raise awareness of dermatological conditions. It does **not** replace physical examination, dermoscopy by a certified dermatologist, or histological biopsy. Any suspicious or changing lesion should be evaluated immediately by a qualified healthcare provider.
 
 ---
+## 📬 Contact
+
+**NAME**
+
+*   LinkedIn: https://www.linkedin.com/in/shahd-al-rabaya-58b8882b1/
+*   GitHub: https://github.com/princedarkness369/
+*   Email: Shahdfalrabaya@gmail.com
 
 ## 📄 License & Attribution
 
